@@ -44,10 +44,7 @@ export default function Index() {
     return () => window.removeEventListener("resize", measure);
   }, [stageHeight]);
 
-  const visibleLayers: LayerState = {
-    ...layers,
-    timeline: layers.timeline && !isMobile ? true : layers.timeline,
-  };
+  // Возрастная шкала выключена по умолчанию (в т.ч. на мобильном).
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-6 font-sans">
