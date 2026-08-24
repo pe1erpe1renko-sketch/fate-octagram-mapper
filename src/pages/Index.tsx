@@ -65,7 +65,7 @@ export default function Index() {
         <ZoomPan initialZoom={fitZoom} height={stageHeight}>
           <Octagram
             matrix={matrix}
-            layers={visibleLayers}
+            layers={layers}
             selectedId={selected?.id ?? null}
             onSelect={setSelected}
           />
