@@ -10,7 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as CabinetIndexRouteImport } from './routes/cabinet.index'
+import { Route as CabinetChatRouteImport } from './routes/cabinet.chat'
+import { Route as CabinetForecastRouteImport } from './routes/cabinet.forecast'
+import { Route as CabinetProfileRouteImport } from './routes/cabinet.profile'
 import { Route as MatrixDateRouteImport } from './routes/matrix.$date'
 
 const IndexRoute = IndexRouteImport.update({
@@ -18,9 +23,34 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CabinetIndexRoute = CabinetIndexRouteImport.update({
+  id: '/cabinet/',
+  path: '/cabinet/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CabinetChatRoute = CabinetChatRouteImport.update({
+  id: '/cabinet/chat',
+  path: '/cabinet/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CabinetForecastRoute = CabinetForecastRouteImport.update({
+  id: '/cabinet/forecast',
+  path: '/cabinet/forecast',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CabinetProfileRoute = CabinetProfileRouteImport.update({
+  id: '/cabinet/profile',
+  path: '/cabinet/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MatrixDateRoute = MatrixDateRouteImport.update({
@@ -31,32 +61,77 @@ const MatrixDateRoute = MatrixDateRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
+  '/cabinet/chat': typeof CabinetChatRoute
+  '/cabinet/forecast': typeof CabinetForecastRoute
+  '/cabinet/profile': typeof CabinetProfileRoute
   '/matrix/$date': typeof MatrixDateRoute
+  '/cabinet/': typeof CabinetIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
+  '/cabinet/chat': typeof CabinetChatRoute
+  '/cabinet/forecast': typeof CabinetForecastRoute
+  '/cabinet/profile': typeof CabinetProfileRoute
   '/matrix/$date': typeof MatrixDateRoute
+  '/cabinet': typeof CabinetIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
+  '/cabinet/chat': typeof CabinetChatRoute
+  '/cabinet/forecast': typeof CabinetForecastRoute
+  '/cabinet/profile': typeof CabinetProfileRoute
   '/matrix/$date': typeof MatrixDateRoute
+  '/cabinet/': typeof CabinetIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/pricing' | '/matrix/$date'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/pricing'
+    | '/cabinet/chat'
+    | '/cabinet/forecast'
+    | '/cabinet/profile'
+    | '/matrix/$date'
+    | '/cabinet/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/pricing' | '/matrix/$date'
-  id: '__root__' | '/' | '/pricing' | '/matrix/$date'
+  to:
+    | '/'
+    | '/login'
+    | '/pricing'
+    | '/cabinet/chat'
+    | '/cabinet/forecast'
+    | '/cabinet/profile'
+    | '/matrix/$date'
+    | '/cabinet'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/pricing'
+    | '/cabinet/chat'
+    | '/cabinet/forecast'
+    | '/cabinet/profile'
+    | '/matrix/$date'
+    | '/cabinet/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LoginRoute: typeof LoginRoute
   PricingRoute: typeof PricingRoute
+  CabinetChatRoute: typeof CabinetChatRoute
+  CabinetForecastRoute: typeof CabinetForecastRoute
+  CabinetProfileRoute: typeof CabinetProfileRoute
   MatrixDateRoute: typeof MatrixDateRoute
+  CabinetIndexRoute: typeof CabinetIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -68,11 +143,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pricing': {
       id: '/pricing'
       path: '/pricing'
       fullPath: '/pricing'
       preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cabinet/': {
+      id: '/cabinet/'
+      path: '/cabinet'
+      fullPath: '/cabinet/'
+      preLoaderRoute: typeof CabinetIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cabinet/chat': {
+      id: '/cabinet/chat'
+      path: '/cabinet/chat'
+      fullPath: '/cabinet/chat'
+      preLoaderRoute: typeof CabinetChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cabinet/forecast': {
+      id: '/cabinet/forecast'
+      path: '/cabinet/forecast'
+      fullPath: '/cabinet/forecast'
+      preLoaderRoute: typeof CabinetForecastRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cabinet/profile': {
+      id: '/cabinet/profile'
+      path: '/cabinet/profile'
+      fullPath: '/cabinet/profile'
+      preLoaderRoute: typeof CabinetProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/matrix/$date': {
@@ -87,8 +197,13 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LoginRoute: LoginRoute,
   PricingRoute: PricingRoute,
+  CabinetChatRoute: CabinetChatRoute,
+  CabinetForecastRoute: CabinetForecastRoute,
+  CabinetProfileRoute: CabinetProfileRoute,
   MatrixDateRoute: MatrixDateRoute,
+  CabinetIndexRoute: CabinetIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
