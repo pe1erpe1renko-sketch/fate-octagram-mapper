@@ -8,7 +8,7 @@ import { ChatMessage } from "@/components/ChatMessage";
 
 const toIso = (date: string) => date.split("-").reverse().join("-");
 
-export default function CabinetChat() {
+export default function Chat() {
   const { plan } = useAccess();
   const { savedDates, chat, appendChat, chatUsedToday, countChatMessage } = useUser();
   const [text, setText] = useState("");

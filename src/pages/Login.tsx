@@ -32,7 +32,9 @@ export default function Login() {
         </p>
         <button
           type="button"
-          onClick={() => login(email)}
+          onClick={() =>
+            login({ type: "email", value: email, displayName: email.split("@")[0] || email })
+          }
           className="mt-6 w-full border border-border bg-muted px-3 py-2 text-sm text-foreground hover:bg-accent"
         >
           Войти в демо-режиме

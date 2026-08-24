@@ -16,7 +16,7 @@ import {
 const toIso = (date: string) => date.split("-").reverse().join("-");
 const RU_DATE = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric" });
 
-export default function CabinetProfile() {
+export default function Profile() {
   const { plan, setPlan } = useAccess();
   const { user, logout, savedDates, settings, setSetting } = useUser();
   const [subOpen, setSubOpen] = useState(false);
@@ -45,7 +45,7 @@ export default function CabinetProfile() {
   }
 
   async function onTelegram() {
-    await linkTelegram(user?.email ?? "demo");
+    await linkTelegram(user?.identity.value ?? "demo");
     setTgOpen(true);
   }
 
@@ -54,7 +54,7 @@ export default function CabinetProfile() {
       <h1 className="text-lg font-semibold text-foreground">Профиль</h1>
 
       <dl className="mt-4 border border-border p-3 text-sm">
-        <Row label="Email" value={user?.email ?? "—"} />
+        <Row label="Аккаунт" value={user?.identity.value ?? "—"} />
         <Row label="Тариф" value={plan.title} />
         <Row label="Следующее списание" value={nextCharge ?? "—"} />
       </dl>
