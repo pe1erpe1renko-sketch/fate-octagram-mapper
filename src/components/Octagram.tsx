@@ -316,7 +316,7 @@ function TimelineLayer({ timeline }: { timeline: Matrix["timeline"] }) {
 
 /** Подписи родовых линий вдоль диагоналей, на пустом участке между mid и центром. */
 function AncestralLabel({ corner, text, angle, sign }: { corner: "NW" | "NE"; text: string; angle: number; sign: number }) {
-  const base = lerp(OUTER[corner], CENTER, 0.78);
+  const base = lerp(OUTER[corner], CENTER, 0.74);
   const n = perpendicular(OUTER[corner], CENTER);
   const x = base.x + n.x * 14 * sign;
   const y = base.y + n.y * 14 * sign;
