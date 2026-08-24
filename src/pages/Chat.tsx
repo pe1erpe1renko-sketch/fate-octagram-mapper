@@ -12,6 +12,7 @@ const toIso = (date: string) => date.split("-").reverse().join("-");
 export default function Chat() {
   const { plan } = useAccess();
   const { user, savedDates, chat, appendChat, chatUsedToday, countChatMessage } = useUser();
+  const { openAuth } = useAuthModal();
   const [text, setText] = useState("");
   const [pending, setPending] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);

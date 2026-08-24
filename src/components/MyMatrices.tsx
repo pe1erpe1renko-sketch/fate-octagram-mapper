@@ -20,6 +20,7 @@ const toIso = (date: string) => date.split("-").reverse().join("-");
 export function MyMatrices() {
   const { plan } = useAccess();
   const { user, savedDates, addSavedDate, removeSavedDate } = useUser();
+  const { openAuth } = useAuthModal();
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState("");
   const [limitOpen, setLimitOpen] = useState(false);
