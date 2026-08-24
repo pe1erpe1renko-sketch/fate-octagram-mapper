@@ -48,17 +48,55 @@ export interface TimelinePoint {
   kind: "decade" | "half" | "quarter";
 }
 
+export interface ChakraRow {
+  key: string;
+  name: string;
+  sphere: string;
+  color: string;
+  physics: number;
+  energy: number;
+  emotions: number;
+}
+
+export interface Chakras {
+  rows: ChakraRow[];
+  total: { physics: number; energy: number; emotions: number };
+}
+
+export interface AncestralLine {
+  first: number;
+  second: number;
+  result: number;
+}
+
+export interface Purpose {
+  personal: { sky: number; earth: number; result: number; title: string; hint: string };
+  social: { male: number; female: number; result: number; title: string; hint: string };
+  spiritual: { result: number; title: string; hint: string };
+  planetary: { result: number; title: string; hint: string };
+}
+
+export interface Today {
+  age: number;
+  from: number;
+  to: number;
+  arcana: number;
+  nextArcana: number;
+  yearsToChange: number;
+}
+
 export interface Matrix {
   birthDate: string;
   core: Core;
   axes: { horizontal: Axis; vertical: Axis };
   diagonals: { NW: Ray; NE: Ray; SE: Ray; SW: Ray };
-  chakras: unknown;
-  ancestral: unknown;
-  purpose: unknown;
+  chakras: Chakras;
+  ancestral: { male: AncestralLine; female: AncestralLine };
+  purpose: Purpose;
   timeline: TimelinePoint[];
-  today: unknown;
+  today: Today;
 }
 
 export function toArcana(n: number): number;
 export function calculateMatrix(birthDate: string): Matrix;
+
