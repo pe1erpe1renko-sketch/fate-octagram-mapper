@@ -4,6 +4,7 @@ import { calculateMatrix } from "@/lib/matrixEngine";
 import { sendMessage } from "@/lib/chat";
 import { useAccess } from "@/context/AccessContext";
 import { useUser } from "@/context/UserContext";
+import { useAuthModal } from "@/context/AuthModalContext";
 import { ChatMessage } from "@/components/ChatMessage";
 
 const toIso = (date: string) => date.split("-").reverse().join("-");
@@ -30,12 +31,13 @@ export default function Chat() {
         <p className="mt-3 rounded-lg border border-border p-4 text-sm text-muted-foreground">
           Войдите, чтобы начать общение.
         </p>
-        <Link
-          to="/login"
+        <button
+          type="button"
+          onClick={() => openAuth("login")}
           className="mt-3 inline-block rounded-md border border-border bg-muted px-3 py-1.5 text-sm text-foreground hover:bg-accent"
         >
           Войти
-        </Link>
+        </button>
       </main>
     );
   }

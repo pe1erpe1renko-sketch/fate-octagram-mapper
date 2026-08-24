@@ -1,6 +1,6 @@
-import { Link } from "@tanstack/react-router";
 import { LogIn, LogOut } from "lucide-react";
 import { useUser } from "@/context/UserContext";
+import { useAuthModal } from "@/context/AuthModalContext";
 
 /**
  * Карточка пользователя внизу панели.
@@ -9,17 +9,21 @@ import { useUser } from "@/context/UserContext";
  */
 export function SidebarUser({ onNavigate }: { onNavigate?: (() => void) | undefined }) {
   const { user, logout } = useUser();
+  const { openAuth } = useAuthModal();
 
   if (!user) {
     return (
-      <Link
-        to="/login"
-        onClick={onNavigate}
+      <button
+        type="button"
+        onClick={() => {
+          onNavigate?.();
+          openAuth("login");
+        }}
         className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2.5 text-sm text-foreground transition-colors hover:bg-accent"
       >
         <LogIn className="h-4 w-4" />
         Войти
-      </Link>
+      </button>
     );
   }
 

@@ -4,6 +4,7 @@ import { calculateMatrix } from "@/lib/matrixEngine";
 import { DateInput } from "@/components/DateInput";
 import { useAccess } from "@/context/AccessContext";
 import { useUser } from "@/context/UserContext";
+import { useAuthModal } from "@/context/AuthModalContext";
 import {
   Dialog,
   DialogContent,
@@ -32,9 +33,9 @@ export function MyMatrices() {
         <h2 className="text-base font-semibold text-foreground">Мои разборы</h2>
         <div className="mt-2 rounded-lg border border-border p-4 text-sm text-muted-foreground">
           Войдите, чтобы сохранять даты и возвращаться к разборам.{" "}
-          <Link to="/login" className="underline">
+          <button type="button" onClick={() => openAuth("login")} className="underline">
             Войти
-          </Link>
+          </button>
         </div>
       </section>
     );

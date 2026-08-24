@@ -90,9 +90,9 @@ export function ForecastFeed() {
         <h2 className="text-base font-semibold text-foreground">Прогнозы</h2>
         <div className="mt-2 rounded-lg border border-border p-4 text-sm text-muted-foreground">
           Войдите, чтобы получать ежедневный аркан дня и хранить архив прогнозов.{" "}
-          <Link to="/login" className="underline">
+          <button type="button" onClick={() => openAuth("login")} className="underline">
             Войти
-          </Link>
+          </button>
         </div>
       </section>
     );
