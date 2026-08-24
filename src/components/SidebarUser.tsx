@@ -7,7 +7,7 @@ import { useUser } from "@/context/UserContext";
  * Показывает displayName и value из identity, не зная способа входа
  * (email / telegram / vk).
  */
-export function SidebarUser({ onNavigate }: { onNavigate?: () => void }) {
+export function SidebarUser({ onNavigate }: { onNavigate?: (() => void) | undefined }) {
   const { user, logout } = useUser();
 
   if (!user) {

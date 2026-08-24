@@ -3,7 +3,7 @@ import { MessageCircle, CreditCard, User, Plus, type LucideIcon } from "lucide-r
 import { SidebarUser } from "@/components/SidebarUser";
 
 interface NavItem {
-  to: string;
+  to: "/chat" | "/pricing" | "/profile";
   label: string;
   icon: LucideIcon;
 }
@@ -26,7 +26,7 @@ export const NAV_ITEMS: NavGroup[] = [
 ];
 
 /** Боковая панель: логотип, главное действие, пункты меню, карточка пользователя. */
-export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
+export function Sidebar({ onNavigate }: { onNavigate?: (() => void) | undefined }) {
   return (
     <div className="flex h-full w-[260px] flex-col border-r border-border bg-background font-sans">
       <div className="px-5 py-5">
