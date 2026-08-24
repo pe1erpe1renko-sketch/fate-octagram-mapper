@@ -336,7 +336,7 @@ function AncestralLabel({ corner, text, angle, sign }: { corner: "NW" | "NE"; te
 function AncestralLayer() {
   return (
     <g fontFamily="system-ui, sans-serif" fontSize={9} fill="#888888" style={{ pointerEvents: "none" }}>
-      <AncestralLabel corner="NW" text="линия мужского рода" angle={-45} sign={-1} />
+      <AncestralLabel corner="NW" text="линия мужского рода" angle={-45} sign={1} />
       <AncestralLabel corner="NE" text="линия женского рода" angle={45} sign={1} />
     </g>
   );
