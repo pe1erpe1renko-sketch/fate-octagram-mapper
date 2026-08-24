@@ -30,3 +30,49 @@ export async function verifyToken(token) {
 export function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim());
 }
+
+/**
+ * Вход через внешнего провайдера (telegram | max | yandex | vk).
+ * TODO: подключить OAuth — редирект на провайдера и обмен кода на сессию.
+ * @param {string} provider
+ */
+export async function loginWithProvider(provider) {
+  // TODO: подключить OAuth. Сейчас — демо-режим без проверки.
+  await new Promise((resolve) => setTimeout(resolve, 200));
+  const labels = { telegram: "Telegram", max: "MAX", yandex: "Яндекс", vk: "VK" };
+  return {
+    ok: true,
+    demo: true,
+    identity: {
+      type: provider,
+      value: `demo@${provider}`,
+      displayName: labels[provider] || provider,
+    },
+  };
+}
+
+/**
+ * Вход по email и паролю.
+ * TODO: подключить Supabase Auth (signInWithPassword).
+ */
+export async function loginWithEmail(email, _password) {
+  await new Promise((resolve) => setTimeout(resolve, 200));
+  return {
+    ok: true,
+    demo: true,
+    identity: { type: "email", value: email, displayName: email.split("@")[0] },
+  };
+}
+
+/**
+ * Регистрация по email и паролю.
+ * TODO: подключить Supabase Auth (signUp).
+ */
+export async function registerWithEmail(name, email, _password) {
+  await new Promise((resolve) => setTimeout(resolve, 200));
+  return {
+    ok: true,
+    demo: true,
+    identity: { type: "email", value: email, displayName: name || email.split("@")[0] },
+  };
+}
