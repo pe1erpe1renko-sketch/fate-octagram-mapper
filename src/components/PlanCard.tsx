@@ -5,7 +5,7 @@ import { PLAN_FEATURES } from "@/lib/access";
 interface PlanCardProps {
   plan: Plan;
   recommended?: boolean;
-  note?: string;
+  note?: string | undefined;
   active?: boolean;
   onChoose: (planId: Plan["id"]) => void;
 }
