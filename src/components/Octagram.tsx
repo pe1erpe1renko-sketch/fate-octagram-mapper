@@ -292,9 +292,6 @@ function TimelineLayer({ timeline }: { timeline: Matrix["timeline"] }) {
 function AncestralLayer() {
   return (
     <g fontFamily="system-ui, sans-serif" fontSize={10} fill="#777777">
-      <text>
-        <textPath href="#none" />
-      </text>
       <text
         transform={`translate(${(OUTER.NW.x + CX) / 2 - 10} ${(OUTER.NW.y + CY) / 2 - 10}) rotate(45)`}
         textAnchor="middle"
