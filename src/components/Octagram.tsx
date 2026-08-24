@@ -1,23 +1,13 @@
+import { useState } from "react";
 import { POINT_CODES, type Matrix, type PointCode } from "@/lib/matrixEngine";
 import type { LayerState } from "./OctagramLayers";
 
 // ── Геометрия ──────────────────────────────────────────────────────────────
-export const VIEW_SIZE = 560;
-const CX = 280;
-const CY = 280;
-const R = 200;
-const TIMELINE_R = 240;
-
-const OUTER_ANGLES: Record<Exclude<PointCode, "C">, number> = {
-  W: 180,
-  NW: 135,
-  N: 90,
-  NE: 45,
-  E: 0,
-  SE: 315,
-  S: 270,
-  SW: 225,
-};
+export const VIEW_SIZE = 640;
+const CX = 320;
+const CY = 320;
+const R = 230;
+const TIMELINE_R = 275;
 
 interface XY {
   x: number;
@@ -30,9 +20,17 @@ function polar(angleDeg: number, r: number): XY {
   return { x: CX + r * Math.cos(a), y: CY - r * Math.sin(a) };
 }
 
-/** Точка на доле t пути от a к b (t может быть > 1). */
+/** Точка на доле t пути от a к b. */
 function lerp(a: XY, b: XY, t: number): XY {
   return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+}
+
+/** Единичный вектор, перпендикулярный отрезку a→b. */
+function perpendicular(a: XY, b: XY): XY {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const len = Math.hypot(dx, dy) || 1;
+  return { x: -dy / len, y: dx / len };
 }
 
 const OUTER: Record<Exclude<PointCode, "C">, XY> = {
@@ -47,14 +45,14 @@ const OUTER: Record<Exclude<PointCode, "C">, XY> = {
 };
 const CENTER: XY = { x: CX, y: CY };
 
-/** Доли пути от края к центру (центр = 1.0). */
+/** Доли полного пути оси: начало = 0, центр = 0.5, конец = 1. */
 const AXIS_FRACTIONS: Array<{ key: "startOuter" | "startMid" | "startInner" | "endMid" | "endOuter" | "end"; t: number }> = [
-  { key: "startOuter", t: 0.25 },
-  { key: "startMid", t: 0.5 },
-  { key: "startInner", t: 0.75 },
-  { key: "endMid", t: 1.225 },
-  { key: "endOuter", t: 1.375 },
-  { key: "end", t: 1.5 },
+  { key: "startOuter", t: 0.125 },
+  { key: "startMid", t: 0.25 },
+  { key: "startInner", t: 0.375 },
+  { key: "endMid", t: 0.7 },
+  { key: "endOuter", t: 0.85 },
+  { key: "end", t: 1.0 },
 ];
 
 const AXIS_LABELS: Record<string, string> = {
@@ -75,17 +73,15 @@ export interface OctagramPoint {
   x: number;
   y: number;
   r: number;
+  hitR: number;
   fontSize: number;
 }
 
-function buildPoints(matrix: Matrix): OctagramPoint[] {
-  const points: OctagramPoint[] = [];
-
-  // Восемь внешних точек
-  (Object.keys(OUTER) as Array<Exclude<PointCode, "C">>).forEach((code) => {
+function buildOuterPoints(matrix: Matrix): OctagramPoint[] {
+  return (Object.keys(OUTER) as Array<Exclude<PointCode, "C">>).map((code) => {
     const meta = POINT_CODES[code];
     const pos = OUTER[code];
-    points.push({
+    return {
       id: code,
       title: meta.title,
       hint: meta.hint,
@@ -93,31 +89,36 @@ function buildPoints(matrix: Matrix): OctagramPoint[] {
       x: pos.x,
       y: pos.y,
       r: 26,
-      fontSize: 20,
-    });
+      hitR: 34,
+      fontSize: 19,
+    };
   });
+}
 
-  // Центр
-  points.push({
+function buildCenterPoint(matrix: Matrix): OctagramPoint {
+  return {
     id: "C",
     title: POINT_CODES.C.title,
     hint: POINT_CODES.C.hint,
     arcana: matrix.core.C,
     x: CX,
     y: CY,
-    r: 30,
-    fontSize: 24,
-  });
+    r: 28,
+    hitR: 34,
+    fontSize: 22,
+  };
+}
 
-  // Горизонтальная ось (от W к E) и вертикальная (от N к S)
+function buildAxisPoints(matrix: Matrix): OctagramPoint[] {
   const axisDefs = [
     { axis: matrix.axes.horizontal, from: OUTER.W, to: OUTER.E, id: "H", name: "Горизонталь (Физика)" },
     { axis: matrix.axes.vertical, from: OUTER.N, to: OUTER.S, id: "V", name: "Вертикаль (Энергия)" },
   ] as const;
 
-  axisDefs.forEach(({ axis, from, id, name }) => {
+  const points: OctagramPoint[] = [];
+  axisDefs.forEach(({ axis, from, to, id, name }) => {
     AXIS_FRACTIONS.forEach(({ key, t }) => {
-      const pos = lerp(from, CENTER, t);
+      const pos = lerp(from, to, t);
       points.push({
         id: `${id}-${key}`,
         title: `${name} — ${AXIS_LABELS[key] ?? key}`,
@@ -125,18 +126,22 @@ function buildPoints(matrix: Matrix): OctagramPoint[] {
         arcana: axis[key],
         x: pos.x,
         y: pos.y,
-        r: 14,
-        fontSize: 12,
+        r: 13,
+        hitR: 22,
+        fontSize: 11,
       });
     });
   });
+  return points;
+}
 
-  // Диагонали
+function buildDiagonalPoints(matrix: Matrix): OctagramPoint[] {
+  const points: OctagramPoint[] = [];
   (["NW", "NE", "SE", "SW"] as const).forEach((code) => {
     const ray = matrix.diagonals[code];
     const corner = OUTER[code];
     ([
-      { key: "outer", t: 0.3, value: ray.outer },
+      { key: "outer", t: 0.32, value: ray.outer },
       { key: "mid", t: 0.6, value: ray.mid },
     ] as const).forEach(({ key, t, value }) => {
       const pos = lerp(corner, CENTER, t);
@@ -147,12 +152,12 @@ function buildPoints(matrix: Matrix): OctagramPoint[] {
         arcana: value,
         x: pos.x,
         y: pos.y,
-        r: 14,
-        fontSize: 12,
+        r: 13,
+        hitR: 22,
+        fontSize: 11,
       });
     });
   });
-
   return points;
 }
 
@@ -165,10 +170,27 @@ interface OctagramProps {
 }
 
 export function Octagram({ matrix, layers, selectedId, onSelect }: OctagramProps) {
-  const points = buildPoints(matrix);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+
+  const outerPoints = buildOuterPoints(matrix);
+  const diagonalPoints = buildDiagonalPoints(matrix);
+  const axisPoints = buildAxisPoints(matrix);
+  const centerPoint = buildCenterPoint(matrix);
+
   const octagonPath = (["W", "NW", "N", "NE", "E", "SE", "S", "SW"] as const)
     .map((c) => `${OUTER[c].x},${OUTER[c].y}`)
     .join(" ");
+
+  const renderPoint = (p: OctagramPoint) => (
+    <PointCircle
+      key={p.id}
+      point={p}
+      selected={selectedId === p.id}
+      hovered={hoveredId === p.id}
+      onHover={setHoveredId}
+      onSelect={onSelect}
+    />
+  );
 
   return (
     <svg
@@ -179,7 +201,7 @@ export function Octagram({ matrix, layers, selectedId, onSelect }: OctagramProps
       role="img"
       aria-label="Матрица судьбы"
     >
-      {/* Линии */}
+      {/* 1. Линии */}
       <g fill="none" stroke="#cccccc" strokeWidth={1}>
         <polygon points={octagonPath} />
         <polygon points={(["W", "N", "E", "S"] as const).map((c) => `${OUTER[c].x},${OUTER[c].y}`).join(" ")} />
@@ -190,22 +212,19 @@ export function Octagram({ matrix, layers, selectedId, onSelect }: OctagramProps
         <line x1={OUTER.NE.x} y1={OUTER.NE.y} x2={OUTER.SW.x} y2={OUTER.SW.y} />
       </g>
 
+      {/* 2. Возрастная шкала */}
       {layers.timeline && <TimelineLayer timeline={matrix.timeline} />}
-      {layers.ancestral && <AncestralLayer />}
-      {layers.money && <ZoneBadge corner="SE" symbol="$" />}
-      {layers.relations && <ZoneBadge corner="SW" symbol="♥" />}
 
-      {/* Точки */}
-      <g>
-        {points.map((p) => (
-          <PointCircle
-            key={p.id}
-            point={p}
-            selected={selectedId === p.id}
-            onSelect={onSelect}
-          />
-        ))}
-      </g>
+      {/* 3–6. Точки: внешние → диагонали → оси → центр */}
+      <g>{outerPoints.map(renderPoint)}</g>
+      <g>{diagonalPoints.map(renderPoint)}</g>
+      <g>{axisPoints.map(renderPoint)}</g>
+      <g>{renderPoint(centerPoint)}</g>
+
+      {/* 7. Подписи слоёв */}
+      {layers.ancestral && <AncestralLayer />}
+      {layers.money && <ZoneBadge corner="SE" symbol="$" color="#1a7f37" />}
+      {layers.relations && <ZoneBadge corner="SW" symbol="♥" color="#c62828" />}
     </svg>
   );
 }
@@ -213,27 +232,24 @@ export function Octagram({ matrix, layers, selectedId, onSelect }: OctagramProps
 function PointCircle({
   point,
   selected,
+  hovered,
+  onHover,
   onSelect,
 }: {
   point: OctagramPoint;
   selected: boolean;
+  hovered: boolean;
+  onHover: (id: string | null) => void;
   onSelect: (p: OctagramPoint) => void;
 }) {
+  const stroke = selected ? "#333333" : hovered ? "#666666" : "#999999";
+  const strokeWidth = selected ? 3 : hovered ? 2 : 1;
+  const fill = hovered && !selected ? "#f2f2f2" : "#ffffff";
+
   return (
-    <g
-      transform={`translate(${point.x} ${point.y})`}
-      className="cursor-pointer"
-      onClick={() => onSelect(point)}
-      role="button"
-      aria-label={`${point.title}: аркан ${point.arcana}`}
-    >
-      <g className="transition-transform duration-100 hover:scale-110" style={{ transformOrigin: "center" }}>
-        <circle
-          r={point.r}
-          fill="#ffffff"
-          stroke={selected ? "#333333" : "#999999"}
-          strokeWidth={selected ? 3 : 1}
-        />
+    <g transform={`translate(${point.x} ${point.y})`}>
+      <g style={{ pointerEvents: "none" }}>
+        <circle r={point.r} fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
         <text
           textAnchor="middle"
           dominantBaseline="central"
@@ -244,6 +260,16 @@ function PointCircle({
           {point.arcana}
         </text>
       </g>
+      <circle
+        r={point.hitR}
+        fill="transparent"
+        className="cursor-pointer"
+        role="button"
+        aria-label={`${point.title}: аркан ${point.arcana}`}
+        onClick={() => onSelect(point)}
+        onMouseEnter={() => onHover(point.id)}
+        onMouseLeave={() => onHover(null)}
+      />
     </g>
   );
 }
@@ -288,38 +314,38 @@ function TimelineLayer({ timeline }: { timeline: Matrix["timeline"] }) {
   );
 }
 
-/** Подписи родовых линий вдоль диагоналей. */
+/** Подписи родовых линий вдоль диагоналей, ближе к углам. */
 function AncestralLayer() {
+  const male = lerp(OUTER.NW, CENTER, 0.13);
+  const female = lerp(OUTER.NE, CENTER, 0.13);
   return (
-    <g fontFamily="system-ui, sans-serif" fontSize={10} fill="#777777">
-      <text
-        transform={`translate(${lerp(OUTER.SE, CENTER, 1.55).x} ${lerp(OUTER.SE, CENTER, 1.55).y}) rotate(-45)`}
-        textAnchor="middle"
-      >
+    <g fontFamily="system-ui, sans-serif" fontSize={10} fill="#777777" style={{ pointerEvents: "none" }}>
+      <text transform={`translate(${male.x} ${male.y}) rotate(45)`} textAnchor="middle" dy={-10}>
         линия мужского рода
       </text>
-      <text
-        transform={`translate(${lerp(OUTER.SW, CENTER, 1.55).x} ${lerp(OUTER.SW, CENTER, 1.55).y}) rotate(45)`}
-        textAnchor="middle"
-      >
+      <text transform={`translate(${female.x} ${female.y}) rotate(-45)`} textAnchor="middle" dy={-10}>
         линия женского рода
       </text>
     </g>
   );
 }
 
-/** Значок зоны рядом с угловой точкой. */
-function ZoneBadge({ corner, symbol }: { corner: "SE" | "SW"; symbol: string }) {
-  const pos = lerp(OUTER[corner], CENTER, 0.15);
+/** Значок зоны рядом с диагональю, со смещением наружу перпендикулярно линии. */
+function ZoneBadge({ corner, symbol, color }: { corner: "SE" | "SW"; symbol: string; color: string }) {
+  const base = lerp(CENTER, OUTER[corner], 0.45);
+  const n = perpendicular(CENTER, OUTER[corner]);
+  const sign = corner === "SE" ? 1 : -1;
+  const pos = { x: base.x + n.x * 22 * sign, y: base.y + n.y * 22 * sign };
   return (
     <text
       x={pos.x}
       y={pos.y}
       textAnchor="middle"
       dominantBaseline="central"
-      fontSize={20}
-      fill="#777777"
+      fontSize={22}
+      fill={color}
       fontFamily="system-ui, sans-serif"
+      style={{ pointerEvents: "none" }}
     >
       {symbol}
     </text>
