@@ -293,13 +293,13 @@ function AncestralLayer() {
   return (
     <g fontFamily="system-ui, sans-serif" fontSize={10} fill="#777777">
       <text
-        transform={`translate(${(OUTER.NW.x + CX) / 2 - 10} ${(OUTER.NW.y + CY) / 2 - 10}) rotate(45)`}
+        transform={`translate(${lerp(OUTER.SE, CENTER, 1.55).x} ${lerp(OUTER.SE, CENTER, 1.55).y}) rotate(-45)`}
         textAnchor="middle"
       >
         линия мужского рода
       </text>
       <text
-        transform={`translate(${(OUTER.NE.x + CX) / 2 + 10} ${(OUTER.NE.y + CY) / 2 - 10}) rotate(-45)`}
+        transform={`translate(${lerp(OUTER.SW, CENTER, 1.55).x} ${lerp(OUTER.SW, CENTER, 1.55).y}) rotate(45)`}
         textAnchor="middle"
       >
         линия женского рода
