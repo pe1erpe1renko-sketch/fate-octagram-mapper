@@ -33,7 +33,7 @@ export default function Home() {
             navigate({
               to: "/matrix/$date",
               params: { date: `${d}-${m}-${y}` },
-              search: name.trim() ? { name: name.trim() } : {},
+              search: { name: name.trim() || undefined },
             });
           }}
         />

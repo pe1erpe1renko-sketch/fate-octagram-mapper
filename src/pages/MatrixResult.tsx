@@ -35,7 +35,7 @@ export function parseUrlDate(raw: string): string | null {
 
 const RU_DATE = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric" });
 
-export default function MatrixResult({ date, name }: { date: string; name?: string }) {
+export default function MatrixResult({ date, name }: { date: string; name?: string | undefined }) {
   const birthDate = useMemo(() => parseUrlDate(date), [date]);
 
   if (!birthDate) return <InvalidDate raw={date} />;
@@ -59,7 +59,7 @@ function InvalidDate({ raw }: { raw: string }) {
   );
 }
 
-function Result({ birthDate, name }: { birthDate: string; name?: string }) {
+function Result({ birthDate, name }: { birthDate: string; name?: string | undefined }) {
   const matrix = useMemo(() => calculateMatrix(birthDate), [birthDate]);
   const sections = useMemo(
     () => buildSectionData(matrix, { unlocked: false }).filter((s) => !OWN_BLOCKS.has(s.id)),

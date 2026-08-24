@@ -3,7 +3,7 @@ import MatrixResult from "@/pages/MatrixResult";
 
 export const Route = createFileRoute("/matrix/$date")({
   validateSearch: (search: Record<string, unknown>) => ({
-    name: typeof search["name"] === "string" ? search["name"] : undefined,
+    name: (typeof search["name"] === "string" ? search["name"] : undefined) as string | undefined,
   }),
   head: ({ params }) => {
     const title = `Матрица судьбы на ${params.date} — расчёт и разбор`;
@@ -26,5 +26,5 @@ export const Route = createFileRoute("/matrix/$date")({
 function MatrixPage() {
   const { date } = Route.useParams();
   const { name } = Route.useSearch();
-  return <MatrixResult date={date} {...(name ? { name } : {})} />;
+  return <MatrixResult date={date} name={name} />;
 }
