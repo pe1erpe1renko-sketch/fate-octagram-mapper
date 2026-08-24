@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Profile from "@/pages/Profile";
-import { RequireUser } from "@/components/RequireUser";
+import GuestProfile from "@/pages/GuestProfile";
+import { useUser } from "@/context/UserContext";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -16,9 +17,10 @@ export const Route = createFileRoute("/profile")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: () => (
-    <RequireUser>
-      <Profile />
-    </RequireUser>
-  ),
+  component: ProfileRoute,
 });
+
+function ProfileRoute() {
+  const { user } = useUser();
+  return user ? <Profile /> : <GuestProfile />;
+}

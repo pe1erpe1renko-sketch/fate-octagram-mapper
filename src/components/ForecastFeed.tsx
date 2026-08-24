@@ -4,6 +4,7 @@ import { calculateMatrix, toArcana } from "@/lib/matrixEngine";
 import { getText } from "@/lib/contentLayer";
 import { useAccess } from "@/context/AccessContext";
 import { useUser, type ForecastEntry } from "@/context/UserContext";
+import { useAuthModal } from "@/context/AuthModalContext";
 import { ForecastCard } from "@/components/ForecastCard";
 
 const toIso = (date: string) => date.split("-").reverse().join("-");
@@ -29,6 +30,7 @@ function dayArcana(day: string, center: number) {
 export function ForecastFeed() {
   const { plan } = useAccess();
   const { user, savedDates, people, forecasts, addForecasts, addPerson } = useUser();
+  const { openAuth } = useAuthModal();
   const [activeId, setActiveId] = useState("self");
   const [loading, setLoading] = useState(false);
 
@@ -90,9 +92,9 @@ export function ForecastFeed() {
         <h2 className="text-base font-semibold text-foreground">Прогнозы</h2>
         <div className="mt-2 rounded-lg border border-border p-4 text-sm text-muted-foreground">
           Войдите, чтобы получать ежедневный аркан дня и хранить архив прогнозов.{" "}
-          <Link to="/login" className="underline">
+          <button type="button" onClick={() => openAuth("login")} className="underline">
             Войти
-          </Link>
+          </button>
         </div>
       </section>
     );

@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import { AccessProvider } from "@/context/AccessContext";
 import { UserProvider } from "@/context/UserContext";
+import { AuthModalProvider } from "@/context/AuthModalContext";
 import { DevPlanSwitcher } from "@/components/DevPlanSwitcher";
 import { AppLayout } from "@/components/AppLayout";
 import { AudioToggle } from "@/components/AudioToggle";
@@ -127,6 +128,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AccessProvider>
         <UserProvider>
+          <AuthModalProvider>
           <CustomCursor />
           <AudioToggle />
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
@@ -134,6 +136,7 @@ function RootComponent() {
             <Outlet />
             <DevPlanSwitcher />
           </AppLayout>
+          </AuthModalProvider>
         </UserProvider>
       </AccessProvider>
     </QueryClientProvider>
