@@ -12,6 +12,15 @@ import { AncestralBlock } from "@/components/AncestralBlock";
 import { SectionList } from "@/components/SectionList";
 import { YearSelector } from "@/components/YearSelector";
 import { DayArcanaCard } from "@/components/DayArcanaCard";
+import { UpgradeBanner } from "@/components/UpgradeBanner";
+import { useAccess } from "@/context/AccessContext";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const MOBILE_BREAKPOINT = 768;
 
@@ -60,11 +69,25 @@ function InvalidDate({ raw }: { raw: string }) {
 }
 
 function Result({ birthDate, name }: { birthDate: string; name?: string | undefined }) {
+  const { plan, planId, dates, hasAccess, addDate } = useAccess();
+  const unlocked = hasAccess("unlockSections");
   const matrix = useMemo(() => calculateMatrix(birthDate), [birthDate]);
   const sections = useMemo(
-    () => buildSectionData(matrix, { unlocked: false }).filter((s) => !OWN_BLOCKS.has(s.id)),
-    [matrix],
+    () => buildSectionData(matrix, { unlocked }).filter((s) => !OWN_BLOCKS.has(s.id)),
+    [matrix, unlocked],
   );
+
+  const [limitReached, setLimitReached] = useState(false);
+  const urlDate = useMemo(() => {
+    const [y, m, d] = birthDate.split("-");
+    return `${d}-${m}-${y}`;
+  }, [birthDate]);
+
+  useEffect(() => {
+    setLimitReached(!addDate(urlDate));
+  }, [addDate, urlDate]);
+
+  const dateLimit = plan.dates === Infinity ? "∞" : plan.dates;
 
   const [selected, setSelected] = useState<OctagramPoint | null>(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -106,6 +129,9 @@ function Result({ birthDate, name }: { birthDate: string; name?: string | undefi
           <p className="text-sm text-muted-foreground">
             Дата рождения: {RU_DATE.format(new Date(birthDate))}
           </p>
+          <p className="text-xs text-muted-foreground">
+            Разобрано дат: {dates.length} из {dateLimit}
+          </p>
         </div>
         <Link
           to="/"
@@ -114,6 +140,8 @@ function Result({ birthDate, name }: { birthDate: string; name?: string | undefi
           Изменить дату
         </Link>
       </header>
+
+      {planId === "single" && <UpgradeBanner />}
 
       <DayArcanaCard today={matrix.today} />
 
@@ -137,7 +165,25 @@ function Result({ birthDate, name }: { birthDate: string; name?: string | undefi
       <PurposeBlock purpose={matrix.purpose} />
       <AncestralBlock ancestral={matrix.ancestral} />
       <YearSelector matrix={matrix} />
-      <SectionList sections={sections} />
+      <SectionList sections={sections} birthDate={birthDate} />
+
+      <Dialog open={limitReached} onOpenChange={(open) => !open && setLimitReached(false)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-base">Достигнут лимит дат</DialogTitle>
+            <DialogDescription>
+              На тарифе «{plan.title}» доступно {dateLimit} дат. Перейдите на тариф выше, чтобы
+              разбирать больше дат.
+            </DialogDescription>
+          </DialogHeader>
+          <Link
+            to="/pricing"
+            className="border border-border bg-muted px-3 py-2 text-center text-sm text-foreground hover:bg-accent"
+          >
+            Выбрать тариф
+          </Link>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
