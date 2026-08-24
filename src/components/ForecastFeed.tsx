@@ -25,9 +25,10 @@ function dayArcana(day: string, center: number) {
   return toArcana(digits + center);
 }
 
-export default function CabinetForecast() {
+/** Лента ежедневных прогнозов на главной. */
+export function ForecastFeed() {
   const { plan } = useAccess();
-  const { savedDates, people, forecasts, addForecasts, addPerson } = useUser();
+  const { user, savedDates, people, forecasts, addForecasts, addPerson } = useUser();
   const [activeId, setActiveId] = useState("self");
   const [loading, setLoading] = useState(false);
 
@@ -43,6 +44,7 @@ export default function CabinetForecast() {
 
   // Демонстрационная лента: 7 записей за последнюю неделю через контентный слой.
   useEffect(() => {
+    if (!user) return;
     let cancelled = false;
     const days = lastWeek();
     const needed = days.filter((day) => !forecasts.some((f) => f.id === `${active.id}_${day}`));
@@ -80,18 +82,32 @@ export default function CabinetForecast() {
     return () => {
       cancelled = true;
     };
-  }, [active, forecasts, addForecasts]);
+  }, [user, active, forecasts, addForecasts]);
+
+  if (!user) {
+    return (
+      <section className="mt-8">
+        <h2 className="text-base font-semibold text-foreground">Прогнозы</h2>
+        <div className="mt-2 rounded-lg border border-border p-4 text-sm text-muted-foreground">
+          Войдите, чтобы получать ежедневный аркан дня и хранить архив прогнозов.{" "}
+          <Link to="/login" className="underline">
+            Войти
+          </Link>
+        </div>
+      </section>
+    );
+  }
 
   const visible = forecasts
     .filter((f) => f.personId === active.id)
     .sort((a, b) => (a.day < b.day ? 1 : -1));
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-8 font-sans">
-      <h1 className="text-lg font-semibold text-foreground">Прогноз</h1>
+    <section className="mt-8">
+      <h2 className="text-base font-semibold text-foreground">Прогнозы</h2>
 
       {!canForecast && (
-        <p className="mt-3 border border-border bg-muted px-3 py-2 text-xs text-foreground">
+        <p className="mt-2 rounded-lg border border-border bg-muted px-3 py-2 text-xs text-foreground">
           Подписка неактивна. Новые прогнозы появятся после продления.{" "}
           <Link to="/pricing" className="underline">
             Тарифы
@@ -100,14 +116,14 @@ export default function CabinetForecast() {
       )}
 
       {hasPeopleTabs ? (
-        <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div className="mt-3 flex flex-wrap items-center gap-2">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => setActiveId(tab.id)}
               className={
-                "border px-2 py-1 text-xs " +
+                "rounded-md border px-2 py-1 text-xs " +
                 (tab.id === active.id
                   ? "border-foreground bg-muted text-foreground"
                   : "border-border text-muted-foreground hover:bg-accent")
@@ -119,17 +135,15 @@ export default function CabinetForecast() {
           {people.length < plan.forecasts && (
             <button
               type="button"
-              onClick={() =>
-                addPerson({ name: `Близкий ${people.length + 1}`, date: "13-07-1998" })
-              }
-              className="border border-dashed border-border px-2 py-1 text-xs text-muted-foreground hover:bg-accent"
+              onClick={() => addPerson({ name: `Близкий ${people.length + 1}`, date: "13-07-1998" })}
+              className="rounded-md border border-dashed border-border px-2 py-1 text-xs text-muted-foreground hover:bg-accent"
             >
               + близкий ({people.length} из {plan.forecasts})
             </button>
           )}
         </div>
       ) : (
-        <p className="mt-4 border border-border p-3 text-xs text-muted-foreground">
+        <p className="mt-3 rounded-lg border border-border p-3 text-xs text-muted-foreground">
           Добавьте близких — доступно на тарифе «Близкий круг».{" "}
           <Link to="/pricing" className="underline">
             Посмотреть
@@ -137,18 +151,18 @@ export default function CabinetForecast() {
         </p>
       )}
 
-      <section className="mt-4 flex flex-col gap-2">
+      <div className="mt-3 flex flex-col gap-2">
         {loading && !visible.length && (
-          <div className="h-24 animate-pulse border border-border bg-muted" />
+          <div className="h-24 animate-pulse rounded-lg border border-border bg-muted" />
         )}
         {visible.map((entry) => (
           <ForecastCard key={entry.id} entry={entry} />
         ))}
-      </section>
+      </div>
 
-      <p className="mt-4 text-xs text-muted-foreground">
+      <p className="mt-3 text-xs text-muted-foreground">
         Архив прогнозов сохраняется навсегда, даже если подписка закончилась.
       </p>
-    </main>
+    </section>
   );
 }

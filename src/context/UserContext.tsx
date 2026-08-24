@@ -41,9 +41,20 @@ export interface UserSettings {
   sfx: boolean;
 }
 
+/** Источник входа: email, телеграм или VK. Компоненты знают только displayName и value. */
+export interface Identity {
+  type: "email" | "telegram" | "vk";
+  value: string;
+  displayName: string;
+}
+
+export interface AppUser {
+  identity: Identity;
+}
+
 interface UserValue {
-  user: { email: string } | null;
-  login: (email: string) => void;
+  user: AppUser | null;
+  login: (identity: Identity) => void;
   logout: () => void;
 
   savedDates: SavedDate[];
@@ -76,7 +87,7 @@ const uid = () => Math.random().toString(36).slice(2, 10);
 const DEMO_DATE: SavedDate = { id: "self", name: "Я", date: "13-07-1998" };
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<{ email: string } | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [savedDates, setSavedDates] = useState<SavedDate[]>([DEMO_DATE]);
   const [people, setPeople] = useState<Person[]>([]);
   const [forecasts, setForecasts] = useState<ForecastEntry[]>([]);
@@ -84,7 +95,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [chatUsage, setChatUsage] = useState({ day: today(), used: 0 });
   const [settings, setSettings] = useState<UserSettings>({ music: false, sfx: false });
 
-  const login = useCallback((email: string) => setUser({ email }), []);
+  const login = useCallback((identity: Identity) => setUser({ identity }), []);
   const logout = useCallback(() => setUser(null), []);
 
   const addSavedDate = useCallback((entry: Omit<SavedDate, "id">) => {

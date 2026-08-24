@@ -15,9 +15,10 @@ import {
 /** 'DD-MM-YYYY' → 'YYYY-MM-DD' */
 const toIso = (date: string) => date.split("-").reverse().join("-");
 
-export default function CabinetDates() {
+/** Список сохранённых разборов на главной. */
+export function MyMatrices() {
   const { plan } = useAccess();
-  const { savedDates, addSavedDate, removeSavedDate } = useUser();
+  const { user, savedDates, addSavedDate, removeSavedDate } = useUser();
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState("");
   const [limitOpen, setLimitOpen] = useState(false);
@@ -25,21 +26,35 @@ export default function CabinetDates() {
   const limit = plan.dates === Infinity ? "∞" : plan.dates;
   const canAdd = savedDates.length < plan.dates;
 
+  if (!user) {
+    return (
+      <section className="mt-8">
+        <h2 className="text-base font-semibold text-foreground">Мои разборы</h2>
+        <div className="mt-2 rounded-lg border border-border p-4 text-sm text-muted-foreground">
+          Войдите, чтобы сохранять даты и возвращаться к разборам.{" "}
+          <Link to="/login" className="underline">
+            Войти
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <main className="mx-auto max-w-3xl px-4 py-8 font-sans">
-      <h1 className="text-lg font-semibold text-foreground">Матрица</h1>
+    <section className="mt-8">
+      <h2 className="text-base font-semibold text-foreground">Мои разборы</h2>
       <p className="mt-1 text-xs text-muted-foreground">
         Разобрано дат: {savedDates.length} из {limit}
       </p>
 
-      <ul className="mt-4 flex flex-col gap-2">
+      <ul className="mt-3 flex flex-col gap-2">
         {savedDates.map((entry) => (
           <DateCard key={entry.id} entry={entry} onRemove={() => removeSavedDate(entry.id)} />
         ))}
       </ul>
 
       {adding ? (
-        <section className="mt-4 border border-border p-3">
+        <div className="mt-3 rounded-lg border border-border p-3">
           <label className="flex max-w-xs flex-col gap-1 text-xs text-muted-foreground">
             Имя (необязательно)
             <input
@@ -66,12 +81,12 @@ export default function CabinetDates() {
           >
             Отмена
           </button>
-        </section>
+        </div>
       ) : (
         <button
           type="button"
           onClick={() => (canAdd ? setAdding(true) : setLimitOpen(true))}
-          className="mt-4 border border-border bg-muted px-3 py-1.5 text-sm text-foreground hover:bg-accent"
+          className="mt-3 rounded-md border border-border bg-muted px-3 py-1.5 text-sm text-foreground hover:bg-accent"
         >
           Добавить дату
         </button>
@@ -88,13 +103,13 @@ export default function CabinetDates() {
           </DialogHeader>
           <Link
             to="/pricing"
-            className="border border-border bg-muted px-3 py-2 text-center text-sm text-foreground hover:bg-accent"
+            className="rounded-md border border-border bg-muted px-3 py-2 text-center text-sm text-foreground hover:bg-accent"
           >
             Посмотреть тарифы
           </Link>
         </DialogContent>
       </Dialog>
-    </main>
+    </section>
   );
 }
 
@@ -114,7 +129,7 @@ function DateCard({
   }, [entry.date]);
 
   return (
-    <li className="flex flex-wrap items-center justify-between gap-2 border border-border p-3">
+    <li className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border p-3">
       <div>
         <div className="text-sm text-foreground">{entry.name}</div>
         <div className="text-xs text-muted-foreground">
@@ -127,7 +142,7 @@ function DateCard({
           to="/matrix/$date"
           params={{ date: entry.date }}
           search={{ name: entry.name }}
-          className="border border-border px-2 py-1 text-xs text-foreground hover:bg-accent"
+          className="rounded-md border border-border px-2 py-1 text-xs text-foreground hover:bg-accent"
         >
           Открыть
         </Link>

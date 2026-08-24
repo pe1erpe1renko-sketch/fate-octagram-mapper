@@ -35,7 +35,7 @@ export function AudioToggle() {
   }, [settings.music]);
 
   return (
-    <div className="fixed left-3 top-3 z-40 flex gap-2">
+    <div className="fixed right-3 top-3 z-40 flex gap-2">
       <audio ref={audioRef} src={AMBIENT_SRC} preload="none" />
       <ToggleButton
         active={settings.music}

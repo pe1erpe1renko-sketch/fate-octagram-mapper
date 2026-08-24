@@ -8,9 +8,9 @@ import { ChatMessage } from "@/components/ChatMessage";
 
 const toIso = (date: string) => date.split("-").reverse().join("-");
 
-export default function CabinetChat() {
+export default function Chat() {
   const { plan } = useAccess();
-  const { savedDates, chat, appendChat, chatUsedToday, countChatMessage } = useUser();
+  const { user, savedDates, chat, appendChat, chatUsedToday, countChatMessage } = useUser();
   const [text, setText] = useState("");
   const [pending, setPending] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -22,6 +22,23 @@ export default function CabinetChat() {
 
   const limit = plan.chatPerDay;
   const left = Math.max(0, limit - chatUsedToday);
+
+  if (!user) {
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-8 font-sans">
+        <h1 className="text-lg font-semibold text-foreground">Чат</h1>
+        <p className="mt-3 rounded-lg border border-border p-4 text-sm text-muted-foreground">
+          Войдите, чтобы начать общение.
+        </p>
+        <Link
+          to="/login"
+          className="mt-3 inline-block rounded-md border border-border bg-muted px-3 py-1.5 text-sm text-foreground hover:bg-accent"
+        >
+          Войти
+        </Link>
+      </main>
+    );
+  }
 
   if (limit === 0) {
     return (

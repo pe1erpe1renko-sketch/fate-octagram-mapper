@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { DateInput } from "@/components/DateInput";
+import { ForecastFeed } from "@/components/ForecastFeed";
+import { MyMatrices } from "@/components/MyMatrices";
 
 const DEFAULT_DATE = "1998-07-13";
 
@@ -38,6 +40,9 @@ export default function Home() {
           }}
         />
       </section>
+
+      <ForecastFeed />
+      <MyMatrices />
     </main>
   );
 }
