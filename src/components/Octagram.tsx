@@ -314,18 +314,30 @@ function TimelineLayer({ timeline }: { timeline: Matrix["timeline"] }) {
   );
 }
 
-/** Подписи родовых линий вдоль диагоналей, ближе к углам. */
-function AncestralLayer() {
-  const male = lerp(OUTER.NW, CENTER, 0.13);
-  const female = lerp(OUTER.NE, CENTER, 0.13);
+/** Подписи родовых линий вдоль диагоналей, на пустом участке между mid и центром. */
+function AncestralLabel({ corner, text, angle, sign }: { corner: "NW" | "NE"; text: string; angle: number; sign: number }) {
+  const base = lerp(OUTER[corner], CENTER, 0.78);
+  const n = perpendicular(OUTER[corner], CENTER);
+  const x = base.x + n.x * 14 * sign;
+  const y = base.y + n.y * 14 * sign;
+  const transform = `rotate(${angle}, ${x}, ${y})`;
   return (
-    <g fontFamily="system-ui, sans-serif" fontSize={10} fill="#777777" style={{ pointerEvents: "none" }}>
-      <text transform={`translate(${male.x} ${male.y}) rotate(45)`} textAnchor="middle" dy={-10}>
-        линия мужского рода
+    <g transform={transform}>
+      <text x={x} y={y} textAnchor="middle" dominantBaseline="central" stroke="#ffffff" strokeWidth={3} paintOrder="stroke">
+        {text}
       </text>
-      <text transform={`translate(${female.x} ${female.y}) rotate(-45)`} textAnchor="middle" dy={-10}>
-        линия женского рода
+      <text x={x} y={y} textAnchor="middle" dominantBaseline="central">
+        {text}
       </text>
+    </g>
+  );
+}
+
+function AncestralLayer() {
+  return (
+    <g fontFamily="system-ui, sans-serif" fontSize={9} fill="#888888" style={{ pointerEvents: "none" }}>
+      <AncestralLabel corner="NW" text="линия мужского рода" angle={-45} sign={-1} />
+      <AncestralLabel corner="NE" text="линия женского рода" angle={45} sign={1} />
     </g>
   );
 }
