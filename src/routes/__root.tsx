@@ -10,7 +10,11 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import { AccessProvider } from "@/context/AccessContext";
+import { UserProvider } from "@/context/UserContext";
 import { DevPlanSwitcher } from "@/components/DevPlanSwitcher";
+import { BottomNav } from "@/components/BottomNav";
+import { AudioToggle } from "@/components/AudioToggle";
+import { CustomCursor } from "@/components/CustomCursor";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -122,9 +126,16 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AccessProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <DevPlanSwitcher />
+        <UserProvider>
+          <CustomCursor />
+          <AudioToggle />
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <div className="pb-16">
+            <Outlet />
+            <DevPlanSwitcher />
+          </div>
+          <BottomNav />
+        </UserProvider>
       </AccessProvider>
     </QueryClientProvider>
   );
