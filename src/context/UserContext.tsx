@@ -41,9 +41,20 @@ export interface UserSettings {
   sfx: boolean;
 }
 
+/** Источник входа: email, телеграм или VK. Компоненты знают только displayName и value. */
+export interface Identity {
+  type: "email" | "telegram" | "vk";
+  value: string;
+  displayName: string;
+}
+
+export interface AppUser {
+  identity: Identity;
+}
+
 interface UserValue {
-  user: { email: string } | null;
-  login: (email: string) => void;
+  user: AppUser | null;
+  login: (identity: Identity) => void;
   logout: () => void;
 
   savedDates: SavedDate[];
