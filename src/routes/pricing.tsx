@@ -1,15 +1,16 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import Pricing from "@/pages/Pricing";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Полный разбор матрицы судьбы — тарифы" },
+      { title: "Тарифы — полный разбор матрицы судьбы" },
       {
         name: "description",
         content:
-          "Страница тарифов полного разбора матрицы судьбы: предназначение, деньги, отношения, здоровье и родовые программы.",
+          "Тарифы полного разбора матрицы судьбы: разовый разбор, подписки со множеством дат, арканом дня и чатом с эзотериком.",
       },
-      { property: "og:title", content: "Полный разбор матрицы судьбы — тарифы" },
+      { property: "og:title", content: "Тарифы — полный разбор матрицы судьбы" },
       {
         property: "og:description",
         content: "Разблокируйте закрытые разделы разбора матрицы судьбы.",
@@ -18,22 +19,5 @@ export const Route = createFileRoute("/pricing")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: PricingPage,
+  component: Pricing,
 });
-
-function PricingPage() {
-  return (
-    <main className="mx-auto max-w-3xl px-4 py-10 font-sans">
-      <h1 className="text-lg font-semibold text-foreground">Полный разбор</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Страница-заглушка. Здесь будут тарифы и оплата закрытых разделов.
-      </p>
-      <Link
-        to="/"
-        className="mt-4 inline-block border border-border bg-muted px-3 py-1 text-sm text-foreground hover:bg-accent"
-      >
-        На главную
-      </Link>
-    </main>
-  );
-}

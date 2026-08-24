@@ -1,9 +1,13 @@
-import { Link } from "@tanstack/react-router";
 import { Lock } from "lucide-react";
 import type { SectionData } from "@/lib/contentPositions";
 
+interface LockedSectionProps {
+  section: SectionData;
+  onUnlock: (section: SectionData) => void;
+}
+
 /** Закрытый раздел: заголовок и lead видны полностью, без блюра. */
-export function LockedSection({ section }: { section: SectionData }) {
+export function LockedSection({ section, onUnlock }: LockedSectionProps) {
   return (
     <div className="flex items-start justify-between gap-3 border border-border px-4 py-3">
       <div className="flex items-start gap-3">
@@ -13,9 +17,13 @@ export function LockedSection({ section }: { section: SectionData }) {
           <p className="text-xs text-muted-foreground">{section.lead}</p>
         </div>
       </div>
-      <Link to="/pricing" className="shrink-0 text-sm text-foreground underline">
+      <button
+        type="button"
+        onClick={() => onUnlock(section)}
+        className="shrink-0 text-sm text-foreground underline"
+      >
         Разблокировать
-      </Link>
+      </button>
     </div>
   );
 }
